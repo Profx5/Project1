@@ -16,6 +16,7 @@ public class BeamPointer : MonoBehaviour
 
     void Update()
     {
+        OVRInput.Update();
         float triggerValue = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
         bool rightTriggerPressed = triggerValue > triggerPressThreshold;
         bool rightTriggerDown = rightTriggerPressed && !wasRightTriggerPressed;
