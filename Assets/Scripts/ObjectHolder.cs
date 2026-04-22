@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ObjectHolder : MonoBehaviour
@@ -42,6 +43,7 @@ public class ObjectHolder : MonoBehaviour
     private GameObject currentMoveGizmo;
 
     private Vector3 holdOffset;
+    private float itemDistance;
 
     private enum ManipulationMode
     {
@@ -120,22 +122,28 @@ public class ObjectHolder : MonoBehaviour
                 switch (currentMode)
                 {
                     case ManipulationMode.Move:
-                        if (gripHeld)
-                        {
-                            UpdateHeldObjectVerticalMovementByTilt();
-                        }
-                        else
-                        {
-                            UpdateHeldObjectMovementByTilt2D();
-                        }
+                        //if (gripHeld)
+                        //{
+                        //    UpdateHeldObjectVerticalMovementByTilt();
+                        //}
+                        //else
+                        //{
+                        //    UpdateHeldObjectMovementByTilt2D();
+                        //}
 
-                        UpdateHeldObjectPosition();
+                        //UpdateHeldObjectPosition();
+                        //
+
+
+                        Ray ray = new Ray(rightHandAnchor.position, rightHandAnchor.forward);
+                        heldObject.transform.position = ray.GetPoint(itemDistance);
                         SetGizmoVisibility(currentMoveGizmo, true);
                         SetGizmoVisibility(currentRotateGizmo, false);
+
                         break;
 
                     case ManipulationMode.Rotate:
-                        UpdateHeldObjectPosition();
+                        //UpdateHeldObjectPosition();
 
                         if (gripHeld)
                         {
@@ -181,6 +189,7 @@ public class ObjectHolder : MonoBehaviour
         }
 
         heldObject = obj;
+        itemDistance = Vector3.Distance(rightHandAnchor.position, obj.transform.position);
         currentSelectable = heldObject.GetComponentInParent<SelectableObject>();
 
         Rigidbody rb = heldObject.GetComponent<Rigidbody>();
