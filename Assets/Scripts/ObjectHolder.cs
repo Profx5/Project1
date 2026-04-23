@@ -6,6 +6,7 @@ public class ObjectHolder : MonoBehaviour
     public Transform centerEyeAnchor;
     public Transform rightHandAnchor;
 
+
     [Header("General")]
     public float triggerPressThreshold = 0.75f;
     public float holdToReleaseTime = 1.0f;
