@@ -3,9 +3,11 @@ using UnityEngine;
 
 public class ObjectHolder : MonoBehaviour
 {
+    public static ObjectHolder Instance { get; private set; }
+
     public Transform centerEyeAnchor;
     public Transform rightHandAnchor;
-
+    public Transform movementAnchor;
 
     [Header("General")]
     public float triggerPressThreshold = 0.75f;
@@ -53,6 +55,18 @@ public class ObjectHolder : MonoBehaviour
     }
 
     private ManipulationMode currentMode = ManipulationMode.Move;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(Instance);
+        } else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
 
     void CycleMode()
     {
@@ -136,7 +150,7 @@ public class ObjectHolder : MonoBehaviour
                         //
 
 
-                        Ray ray = new Ray(rightHandAnchor.position, rightHandAnchor.forward);
+                        Ray ray = new Ray(movementAnchor.position, movementAnchor.forward);
                         heldObject.transform.position = ray.GetPoint(itemDistance);
                         SetGizmoVisibility(currentMoveGizmo, true);
                         SetGizmoVisibility(currentRotateGizmo, false);

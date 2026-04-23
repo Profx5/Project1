@@ -16,6 +16,7 @@ public class PlayerManager : MonoBehaviour
         currSelectionMode = handBeam;
         handBeam.SetActive(true);
         eyeBeam.SetActive(false);
+        ObjectHolder.Instance.movementAnchor = currSelectionMode.GetComponentInParent<Transform>();
         //switchSelectionMethod();
     }
 
@@ -48,6 +49,7 @@ public class PlayerManager : MonoBehaviour
             currSelectionMode = handBeam;
             Debug.Log("HandBeam activated");
         }
+        ObjectHolder.Instance.movementAnchor = currSelectionMode.GetComponentInParent<Transform>();
         currSelectionMode.SetActive(true);
     }
 }
