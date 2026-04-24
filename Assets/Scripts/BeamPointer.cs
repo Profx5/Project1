@@ -10,6 +10,7 @@ public class BeamPointer : MonoBehaviour
     public float triggerPressThreshold = 0.75f;
 
     public ObjectHolder holder;
+    public bool selectable = false;
 
     private SelectableObject currentHover;
     private bool wasRightTriggerPressed = false;
@@ -21,7 +22,7 @@ public class BeamPointer : MonoBehaviour
         bool rightTriggerPressed = triggerValue > triggerPressThreshold;
         bool rightTriggerDown = rightTriggerPressed && !wasRightTriggerPressed;
 
-        if (holder.HasHeldObject())
+        if (holder.HasHeldObject() && selectable)
         {
             ClearHover();
 
@@ -55,7 +56,7 @@ public class BeamPointer : MonoBehaviour
             SpawnMenuButton button = hit.collider.GetComponentInParent<SpawnMenuButton>();
             newHover = hit.collider.GetComponentInParent<SelectableObject>();
 
-            if (rightTriggerDown)
+            if (rightTriggerDown && selectable)
             {
                 if (button != null)
                 {
@@ -75,7 +76,10 @@ public class BeamPointer : MonoBehaviour
             }
         }
 
-        UpdateHighlight(newHover);
+        if(selectable)
+        {
+            UpdateHighlight(newHover);
+        }
         UpdateBeam(origin, distance);
 
         wasRightTriggerPressed = rightTriggerPressed;
