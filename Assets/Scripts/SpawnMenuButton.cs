@@ -1,27 +1,41 @@
+using Meta.XR.ImmersiveDebugger.UserInterface.Generic;
+using TMPro;
 using UnityEngine;
+using Unity.UI;
 
 public class SpawnMenuButton : MonoBehaviour
 {
-    public enum SpawnType
+    [SerializeField] TextMeshProUGUI buttonLabel;
+    private string buttonPath;
+    private SpawningMenu spawnMenu;
+
+    private void Start()
     {
-        Prefab1,
-        Prefab2
+        spawnMenu = gameObject.GetComponentInParent<SpawningMenu>();
     }
 
-    public Spawner spawner;
-    public SpawnType spawnPrefab;
+    public void setButton(string label, string path)
+    {
+        buttonLabel.text = label;
+        buttonPath = path;
+    }
 
     public void Activate()
     {
-        switch (spawnPrefab)
+        if (buttonPath == null)
         {
-            case SpawnType.Prefab1:
-                spawner.SpawnPrefab1();
-                break;
-
-            case SpawnType.Prefab2:
-                spawner.SpawnPrefab2();
-                break;
+            return;
+        }
+        Debug.Log("Button Path: " + buttonPath);
+        string extension = buttonPath.Substring(buttonPath.Length - 4);
+        Debug.Log("Extension: " + extension);
+        if (extension != ".fbx")
+        {
+            spawnMenu.fillButtonsFromFile(buttonPath);
+        } else
+        {
+            spawnMenu.spawnItem(buttonPath);
         }
     }
+
 }
