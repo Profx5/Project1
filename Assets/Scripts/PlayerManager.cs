@@ -17,7 +17,7 @@ public class PlayerManager : MonoBehaviour
         handBeam.SetActive(true);
         eyeBeam.SetActive(false);
         ObjectHolder.Instance.movementAnchor = currSelectionMode.GetComponentInParent<Transform>();
-        //switchSelectionMethod();
+        //switchSelectionMethod(); // Uncomment this to start in head tracking mode
     }
 
     // Update is called once per frame

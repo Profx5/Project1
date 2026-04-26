@@ -11,14 +11,16 @@ public class SpawningMenu : MonoBehaviour
     private string assetPath;
     private int buttonCount;
     [SerializeField] GameObject spawnLocation;
+    private string rootDirectoryName;
+    [SerializeField] float offset = 1f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         assetPath = Application.dataPath + "/Resources/SpawnableItems";
         buttonCount = buttons.Length;
+        rootDirectoryName = "SpawnableItems";
         fillButtonsFromFile(assetPath);
-
     }
 
     // Update is called once per frame
@@ -50,7 +52,7 @@ public class SpawningMenu : MonoBehaviour
     {
         Debug.Log("Filling buttons from: " + path);
         string[] fileInfo1 = Directory.GetDirectories(path);
-        string[] fileInfo2 = Directory.GetFiles(path, "*.fbx");
+        string[] fileInfo2 = Directory.GetFiles(path, "*.prefab");
         string[] fileInfo = fileInfo1.Concat(fileInfo2).ToArray();
         string[] fileNames = new string[fileInfo.Length];
 
@@ -63,16 +65,27 @@ public class SpawningMenu : MonoBehaviour
             fileNames[i] = fileName;
         }
 
-        if (path != assetPath)
+        //Debug.Log("root directory name: " + rootDirectoryName);
+        string pathEnding = path.Substring(path.Length - rootDirectoryName.Length);
+        //Debug.Log("Path ending: " + pathEnding);
+        if (pathEnding == rootDirectoryName)
         {
+            backButton.gameObject.SetActive(false);
+        } else
+        {
+            backButton.gameObject.SetActive(true);
             backButton.setButton("Back", Directory.GetParent(path).FullName);
         }
-        fillButtonsHelper(fileNames, fileInfo);
+            fillButtonsHelper(fileNames, fileInfo);
     }
 
     public void spawnItem(string path)
     {
-        object thing = Resources.Load(path);
-        Debug.Log(thing);
+        string shortPath = "SpawnableItems" + path.Substring(assetPath.Length);
+        GameObject thing = Resources.Load<GameObject>(shortPath);
+        thing = Instantiate(thing);
+        Vector3 place = spawnLocation.transform.position;
+        thing.transform.position = new Vector3(place.x, place.y + offset, place.z);
+
     }
 }
