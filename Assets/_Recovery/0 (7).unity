@@ -119,11 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!4 &62587723 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
-  m_PrefabInstance: {fileID: 901889429}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &74019748
 GameObject:
   m_ObjectHideFlags: 0
@@ -1327,8 +1322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectHolder
   centerEyeAnchor: {fileID: 901889430}
   rightHandAnchor: {fileID: 330011115}
-  leftHandAnchor: {fileID: 1619189713}
-  movementAnchor: {fileID: 330011115}
+  movementAnchor: {fileID: 0}
   triggerPressThreshold: 0.75
   holdToReleaseTime: 1
   moveDeadzone: 15
@@ -1348,11 +1342,6 @@ MonoBehaviour:
   rotationSpeedX: 100
   rotationSpeedY: 120
   rotationSpeedZ: 120
-  maxScale: 3
-  minScale: 0.5
-  scaleSpeed: 120
-  expandDistanceThreshold: 0.75
-  shrinkDistanceThreshold: 0.25
 --- !u!4 &1634043439
 Transform:
   m_ObjectHideFlags: 0
@@ -1413,15 +1402,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Teleport
   rayOrigin: {fileID: 1619189713}
-  rigRoot: {fileID: 62587723}
+  rigRoot: {fileID: 1961067815}
   centerEyeAnchor: {fileID: 901889430}
   teleportMarker: {fileID: 356119756}
   maxDistance: 20
   teleportLayer:
     serializedVersion: 2
     m_Bits: 64
-  snapAngle: 45
-  turnCooldown: 0.3
+--- !u!4 &1961067815 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+  m_PrefabInstance: {fileID: 901889429}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2054842816
 GameObject:
   m_ObjectHideFlags: 0

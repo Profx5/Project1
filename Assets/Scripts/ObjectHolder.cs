@@ -7,6 +7,7 @@ public class ObjectHolder : MonoBehaviour
 
     public Transform centerEyeAnchor;
     public Transform rightHandAnchor;
+    public Transform leftHandAnchor;
     public Transform movementAnchor;
 
     [Header("General")]
@@ -44,14 +45,24 @@ public class ObjectHolder : MonoBehaviour
 
     private GameObject currentRotateGizmo;
     private GameObject currentMoveGizmo;
+    private GameObject currentScaleGizmo;
 
     private Vector3 holdOffset;
     private float itemDistance;
 
+
+    [Header("Scale Mode")]
+    public float maxScale = 3.0f;
+    public float minScale = 0.5f;
+    public float scaleSpeed = 120f;
+    public float expandDistanceThreshold = 5.0f;
+    public float shrinkDistanceThreshold = 0.5f;
+
     private enum ManipulationMode
     {
         Move,
-        Rotate
+        Rotate,
+        Scale
     }
 
     private ManipulationMode currentMode = ManipulationMode.Move;
@@ -77,6 +88,10 @@ public class ObjectHolder : MonoBehaviour
                 break;
 
             case ManipulationMode.Rotate:
+                currentMode = ManipulationMode.Scale;
+                break;
+
+            case ManipulationMode.Scale:
                 currentMode = ManipulationMode.Move;
                 break;
         }
@@ -154,6 +169,7 @@ public class ObjectHolder : MonoBehaviour
                         heldObject.transform.position = ray.GetPoint(itemDistance);
                         SetGizmoVisibility(currentMoveGizmo, true);
                         SetGizmoVisibility(currentRotateGizmo, false);
+                        SetGizmoVisibility(currentScaleGizmo, false);
 
                         break;
 
@@ -170,7 +186,20 @@ public class ObjectHolder : MonoBehaviour
                         }
                         SetGizmoVisibility(currentMoveGizmo, false);
                         SetGizmoVisibility(currentRotateGizmo, true);
+                        SetGizmoVisibility(currentScaleGizmo, false);
                         break;
+
+                    case ManipulationMode.Scale:
+                        if(gripHeld)
+                        {
+                            UpdateHeldObjectScale();
+                        }
+                     
+                        SetGizmoVisibility(currentMoveGizmo, false);
+                        SetGizmoVisibility(currentRotateGizmo, false);
+                        SetGizmoVisibility(currentScaleGizmo, true);
+                        break;
+
                 }
             }
         }
@@ -225,8 +254,12 @@ public class ObjectHolder : MonoBehaviour
         Transform move = heldObject.transform.Find("MoveGizmo");
         currentMoveGizmo = move.gameObject;
 
-        SetGizmoVisibility(currentRotateGizmo, false);
+        Transform scale = heldObject.transform.Find("ScaleGizmo");
+        currentScaleGizmo = scale.gameObject;
+
         SetGizmoVisibility(currentMoveGizmo, true);
+        SetGizmoVisibility(currentRotateGizmo, false);
+        SetGizmoVisibility(currentScaleGizmo, false);
 
         suppressNextTap = true;
         triggerHoldTime = 0f;
@@ -256,9 +289,11 @@ public class ObjectHolder : MonoBehaviour
 
         SetGizmoVisibility(currentRotateGizmo, false);
         SetGizmoVisibility(currentMoveGizmo, false);
+        SetGizmoVisibility(currentScaleGizmo, false);   
 
         currentRotateGizmo = null;
         currentMoveGizmo = null;
+        currentScaleGizmo = null;
 
         Rigidbody rb = heldObject.GetComponent<Rigidbody>();
         if (rb != null)
@@ -374,6 +409,31 @@ public class ObjectHolder : MonoBehaviour
         );
     }
 
+    void UpdateHeldObjectScale()
+    {
+        if(heldObject == null || rightHandAnchor == null)
+        {
+            return;
+        }
+
+        Vector3 rightHandPos = rightHandAnchor.transform.position;
+        Vector3 leftHandPos = leftHandAnchor.transform.position;
+
+        Debug.Log(rightHandPos);
+        Debug.Log(leftHandPos);
+
+        float distance = rightHandPos.x - leftHandPos.x;
+        if(distance >= expandDistanceThreshold)
+        {
+            Debug.Log("Expanding");
+            heldObject.transform.localScale += new Vector3(1, 1, 1) * Time.deltaTime;
+        }
+        else if(distance <= shrinkDistanceThreshold)
+        {
+            Debug.Log("Shrinking");
+            heldObject.transform.localScale -= new Vector3(1, 1, 1) * Time.deltaTime;
+        }
+    }
     void SetGizmoVisibility(GameObject gizmo, bool visible)
     {
         gizmo.SetActive(visible);
