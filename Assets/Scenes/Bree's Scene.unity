@@ -1854,12 +1854,8 @@ MonoBehaviour:
   - {fileID: 1009242258}
   - {fileID: 821547901}
   backButton: {fileID: 655046793}
-<<<<<<< Updated upstream
   spawnLocation: {fileID: 1940825140}
   offset: 0.3
-=======
-  spawnLocation: {fileID: 0}
->>>>>>> Stashed changes
 --- !u!1001 &769625094
 PrefabInstance:
   m_ObjectHideFlags: 0

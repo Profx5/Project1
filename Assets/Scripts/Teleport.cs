@@ -31,7 +31,7 @@ public class Teleport : MonoBehaviour
             if (teleportMarker != null)
             {
                 teleportMarker.gameObject.SetActive(true);
-                teleportMarker.transform.position = hit.point + hit.normal * 0.01f;
+                teleportMarker.position = hit.point + hit.normal * 0.01f;
             }
 
             float trigger = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
@@ -47,9 +47,7 @@ public class Teleport : MonoBehaviour
         else
         {
             if (teleportMarker != null)
-            {
                 teleportMarker.gameObject.SetActive(false);
-            }
         }
     }
 
@@ -71,13 +69,13 @@ public class Teleport : MonoBehaviour
 
         if (Time.time - lastTurnTime > turnCooldown)
         {
-            if (input > 0.75f)
+            if (input > 0.7f)
             {
                 Vector3 pivot = centerEyeAnchor.position;
                 rigRoot.RotateAround(pivot, Vector3.up, snapAngle);
                 lastTurnTime = Time.time;
             }
-            else if (input < -0.75f)
+            else if (input < -0.7f)
             {
                 Vector3 pivot = centerEyeAnchor.position;
                 rigRoot.RotateAround(pivot, Vector3.up, -snapAngle);

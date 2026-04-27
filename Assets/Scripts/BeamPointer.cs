@@ -53,8 +53,7 @@ public class BeamPointer : MonoBehaviour
                 pointerDot.gameObject.SetActive(true);
             }
 
-            SpawnMenuButtonDefault button = hit.collider.GetComponentInParent<SpawnMenuButtonDefault>();
-            Debug.Log(button);
+            SpawnMenuButton button = hit.collider.GetComponentInParent<SpawnMenuButton>();
             newHover = hit.collider.GetComponentInParent<SelectableObject>();
 
             if (rightTriggerDown && selectable)

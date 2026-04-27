@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 public class EyePointer : MonoBehaviour
 {
@@ -13,7 +12,6 @@ public class EyePointer : MonoBehaviour
     private float currHoverTime;
 
     public ObjectHolder holder;
-    public bool selectable = false;
 
     private SelectableObject currentHover;
     private bool wasRightTriggerPressed = false;
@@ -25,7 +23,7 @@ public class EyePointer : MonoBehaviour
         bool rightTriggerPressed = triggerValue > triggerPressThreshold;
         bool rightTriggerDown = rightTriggerPressed && !wasRightTriggerPressed;
 
-        if (holder.HasHeldObject() && selectable)
+        if (holder.HasHeldObject())
         {
             ClearHover();
 
@@ -56,24 +54,18 @@ public class EyePointer : MonoBehaviour
                 pointerDot.gameObject.SetActive(true);
             }
 
-            SpawnMenuButtonDefault button = hit.collider.GetComponentInParent<SpawnMenuButtonDefault>();
+            SpawnMenuButton button = hit.collider.GetComponentInParent<SpawnMenuButton>();
             newHover = hit.collider.GetComponentInParent<SelectableObject>();
-            Debug.Log(newHover);
 
             if (currentHover == newHover)
             {
                 currHoverTime += Time.deltaTime;
-                float progress = Mathf.Clamp01(currHoverTime / hoverTime);
-                if(newHover != null)
-                {
-                    newHover.SetHighlightAmount(progress);
-                }
             } else
             {
                 currHoverTime = 0;
             }
 
-            if (currHoverTime >= hoverTime && selectable)
+            if (currHoverTime >= hoverTime)
             {
                 currHoverTime = 0;
                 if (button != null)
@@ -93,10 +85,8 @@ public class EyePointer : MonoBehaviour
                 pointerDot.gameObject.SetActive(false);
             }
         }
-        if(selectable)
-        {
-            UpdateHighlight(newHover);
-        }
+
+        UpdateHighlight(newHover);
         UpdateBeam(origin, distance);
 
         wasRightTriggerPressed = rightTriggerPressed;
