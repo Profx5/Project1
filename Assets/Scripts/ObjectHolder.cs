@@ -14,26 +14,20 @@ public class ObjectHolder : MonoBehaviour
     public float triggerPressThreshold = 0.75f;
     public float holdToReleaseTime = 1.0f;
 
-    [Header("Move Mode")]
-    public float moveDeadzone = 50f;
-    public float maxMoveTilt = 50f;
-    public float moveSpeed = 2.0f;
-    public float verticalMoveSpeed = 2.0f;
-    public float holdHeightOffset = -0.2f;
-    public float initialHoldDistance = 2.5f;
-    public float minX = -3.0f;
-    public float maxX = 3.0f;
-    public float minY = -1.0f;
-    public float maxY = 2.0f;
-    public float minZ = 0.75f;
-    public float maxZ = 5.0f;
-
     [Header("Rotate Mode")]
     public float rotateDeadzone = 50f;
     public float maxRotateTilt = 55f;
     public float rotationSpeedX = 100f;
     public float rotationSpeedY = 120f;
     public float rotationSpeedZ = 120f;
+
+    [Header("Scale Mode")]
+    public float maxScale = 2.0f;
+    public float minScale = 0.25f;
+    public float expandDistanceThreshold = 5.0f;
+    public float shrinkDistanceThreshold = 0.5f;
+
+    public GameObject selectionManager;
 
     private GameObject heldObject;
     private SelectableObject currentSelectable;
@@ -47,16 +41,7 @@ public class ObjectHolder : MonoBehaviour
     private GameObject currentMoveGizmo;
     private GameObject currentScaleGizmo;
 
-    private Vector3 holdOffset;
     private float itemDistance;
-
-
-    [Header("Scale Mode")]
-    public float maxScale = 3.0f;
-    public float minScale = 0.5f;
-    public float scaleSpeed = 120f;
-    public float expandDistanceThreshold = 5.0f;
-    public float shrinkDistanceThreshold = 0.5f;
 
     private enum ManipulationMode
     {
@@ -72,7 +57,8 @@ public class ObjectHolder : MonoBehaviour
         if (Instance != null && Instance != this)
         {
             Destroy(Instance);
-        } else
+        } 
+        else
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
@@ -152,19 +138,7 @@ public class ObjectHolder : MonoBehaviour
                 switch (currentMode)
                 {
                     case ManipulationMode.Move:
-                        //if (gripHeld)
-                        //{
-                        //    UpdateHeldObjectVerticalMovementByTilt();
-                        //}
-                        //else
-                        //{
-                        //    UpdateHeldObjectMovementByTilt2D();
-                        //}
-
-                        //UpdateHeldObjectPosition();
-                        //
-
-
+                        selectionManager.GetComponent<PlayerManager>().enabled = false;
                         Ray ray = new Ray(movementAnchor.position, movementAnchor.forward);
                         heldObject.transform.position = ray.GetPoint(itemDistance);
                         SetGizmoVisibility(currentMoveGizmo, true);
@@ -174,8 +148,6 @@ public class ObjectHolder : MonoBehaviour
                         break;
 
                     case ManipulationMode.Rotate:
-                        //UpdateHeldObjectPosition();
-
                         if (gripHeld)
                         {
                             UpdateHeldObjectRotationZByTilt();
@@ -246,7 +218,6 @@ public class ObjectHolder : MonoBehaviour
         }
 
         currentMode = ManipulationMode.Move;
-        holdOffset = new Vector3(0f, holdHeightOffset, initialHoldDistance);
 
         Transform rotate = heldObject.transform.Find("RotateGizmo");
         currentRotateGizmo = rotate.gameObject;
@@ -270,8 +241,6 @@ public class ObjectHolder : MonoBehaviour
             currentSelectable.Unhighlight();
         }
 
-        UpdateHeldObjectPosition();
-
         Debug.Log("Holding object: " + obj.name + " | Mode: " + currentMode);
     }
 
@@ -281,6 +250,8 @@ public class ObjectHolder : MonoBehaviour
         {
             return;
         }
+
+        selectionManager.GetComponent<PlayerManager>().enabled = true;
 
         if (currentSelectable != null)
         {
@@ -306,64 +277,6 @@ public class ObjectHolder : MonoBehaviour
 
         heldObject = null;
         currentSelectable = null;
-    }
-
-    void UpdateHeldObjectPosition()
-    {
-        if (heldObject == null || centerEyeAnchor == null)
-        {
-            return;
-        }
-
-        Vector3 forward = centerEyeAnchor.forward;
-        forward.y = 0f;
-        forward.Normalize();
-
-        Vector3 right = centerEyeAnchor.right;
-        right.y = 0f;
-        right.Normalize();
-
-        Vector3 worldPos =
-            centerEyeAnchor.position +
-            right * holdOffset.x +
-            Vector3.up * holdOffset.y +
-            forward * holdOffset.z;
-
-        heldObject.transform.position = worldPos;
-    }
-
-    void UpdateHeldObjectMovementByTilt2D()
-    {
-        if (rightHandAnchor == null)
-        {
-            return;
-        }
-
-        float pitch = NormalizeAngle(rightHandAnchor.localEulerAngles.x);
-        float roll = NormalizeAngle(rightHandAnchor.localEulerAngles.z);
-
-        float forwardInput = GetTiltInput(pitch, moveDeadzone, maxMoveTilt);
-        float rightInput = GetTiltInput(roll, moveDeadzone, maxMoveTilt);
-
-        holdOffset.z += forwardInput * moveSpeed * Time.deltaTime;
-        holdOffset.x -= rightInput * moveSpeed * Time.deltaTime;
-
-        holdOffset.x = Mathf.Clamp(holdOffset.x, minX, maxX);
-        holdOffset.z = Mathf.Clamp(holdOffset.z, minZ, maxZ);
-    }
-
-    void UpdateHeldObjectVerticalMovementByTilt()
-    {
-        if (rightHandAnchor == null)
-        {
-            return;
-        }
-
-        float pitch = NormalizeAngle(rightHandAnchor.localEulerAngles.x);
-        float verticalInput = GetTiltInput(pitch, moveDeadzone, maxMoveTilt);
-
-        holdOffset.y -= verticalInput * verticalMoveSpeed * Time.deltaTime;
-        holdOffset.y = Mathf.Clamp(holdOffset.y, minY, maxY);
     }
 
     void UpdateHeldObjectRotationXYByTilt()
@@ -422,16 +335,24 @@ public class ObjectHolder : MonoBehaviour
         Debug.Log(rightHandPos);
         Debug.Log(leftHandPos);
 
-        float distance = rightHandPos.x - leftHandPos.x;
+        float distance = Mathf.Abs(rightHandPos.x - leftHandPos.x);
+        Debug.Log(distance);
         if(distance >= expandDistanceThreshold)
         {
             Debug.Log("Expanding");
-            heldObject.transform.localScale += new Vector3(1, 1, 1) * Time.deltaTime;
+            if(heldObject.transform.localScale.x < maxScale)
+            {
+                heldObject.transform.localScale += new Vector3(1, 1, 1) * Time.deltaTime;
+            }
+
         }
         else if(distance <= shrinkDistanceThreshold)
         {
             Debug.Log("Shrinking");
-            heldObject.transform.localScale -= new Vector3(1, 1, 1) * Time.deltaTime;
+            if (heldObject.transform.localScale.x > minScale)
+            {
+                heldObject.transform.localScale -= new Vector3(1, 1, 1) * Time.deltaTime;
+            }
         }
     }
     void SetGizmoVisibility(GameObject gizmo, bool visible)
