@@ -12,6 +12,7 @@ public class EyePointer : MonoBehaviour
     private float currHoverTime;
 
     public ObjectHolder holder;
+    public bool selectable = false;
 
     private SelectableObject currentHover;
     private bool wasRightTriggerPressed = false;
@@ -23,7 +24,7 @@ public class EyePointer : MonoBehaviour
         bool rightTriggerPressed = triggerValue > triggerPressThreshold;
         bool rightTriggerDown = rightTriggerPressed && !wasRightTriggerPressed;
 
-        if (holder.HasHeldObject())
+        if (holder.HasHeldObject() && selectable)
         {
             ClearHover();
 
@@ -65,7 +66,7 @@ public class EyePointer : MonoBehaviour
                 currHoverTime = 0;
             }
 
-            if (currHoverTime >= hoverTime)
+            if (currHoverTime >= hoverTime && selectable)
             {
                 currHoverTime = 0;
                 if (button != null)
@@ -86,7 +87,10 @@ public class EyePointer : MonoBehaviour
             }
         }
 
-        UpdateHighlight(newHover);
+        if(selectable)
+        {
+            UpdateHighlight(newHover);
+        }
         UpdateBeam(origin, distance);
 
         wasRightTriggerPressed = rightTriggerPressed;
